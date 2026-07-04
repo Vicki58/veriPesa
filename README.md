@@ -20,7 +20,7 @@ Small business vendors frequently lose money to fake M-Pesa screenshots and manu
 
 ## Project Context
 Developed as part of IBL 2305: Software Design and Development  
-The Technical University of Kenya — B.Tech CNIT Year 2, June–August 2026  
+The Technical University of Kenya — B.Tech IT Year 2, June–August 2026  
 Lecturer: Mr. Chrispinus Ambani
 
 ## Status
