@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VeriPesa Vendor Dashboard. Reconcile transactions, check expectations vs real receipts, and manage payment disputes.">
+  <title>Dashboard — VeriPesa</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h2 class="brand-name">VeriPesa</h2>
+      </div>
+
+      <nav style="flex: 1;">
+        <ul class="sidebar-menu">
+          <li class="menu-item active">
+            <a href="dashboard.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="new-sale.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>New Sale</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="transactions.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+              <span>Ledger Logs</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="disputes.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              <span>Disputes</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="settings.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="vendor-profile-snippet">
+          <div class="avatar">-</div>
+          <div class="vendor-info">
+            <div class="vendor-name-snippet">Loading...</div>
+            <div class="vendor-till-snippet">Till: Loading</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Vendor Reconciliation</h1>
+          <p class="page-subtitle">Reconcile expected sales against real-time Safaricom payments.</p>
+        </div>
+        <a href="new-sale.html" class="btn" style="width: auto; padding: 12px 20px;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+          New Sale Entry
+        </a>
+      </header>
+
+      <!-- Stats Metrics Grid -->
+      <section class="stats-grid">
+        <div class="stat-card glass" style="--glow-color: rgba(99, 102, 241, 0.2);">
+          <div class="stat-header">
+            <span>Expected Today</span>
+            <span style="color: var(--primary);">Ksh</span>
+          </div>
+          <div class="stat-value" id="expectedVal">Ksh 0.00</div>
+          <div class="stat-desc">Sum of all initiated sale records</div>
+        </div>
+        <div class="stat-card glass" style="--glow-color: rgba(16, 185, 129, 0.2);">
+          <div class="stat-header">
+            <span>Received Today</span>
+            <span style="color: var(--success);">Ksh</span>
+          </div>
+          <div class="stat-value" id="receivedVal" style="color: var(--success);">Ksh 0.00</div>
+          <div class="stat-desc">Matched M-Pesa transaction amounts</div>
+        </div>
+        <div class="stat-card glass" style="--glow-color: rgba(59, 130, 246, 0.2);">
+          <div class="stat-header">
+            <span>Verified Orders</span>
+            <span class="badge badge-verified" id="verifiedCount">0</span>
+          </div>
+          <div class="stat-value" id="verifiedVal">0</div>
+          <div class="stat-desc">Successfully validated payments</div>
+        </div>
+        <div class="stat-card glass" style="--glow-color: rgba(245, 158, 11, 0.2);">
+          <div class="stat-header">
+            <span>Flagged Disputes</span>
+            <span class="badge badge-flagged" id="flaggedCount">0</span>
+          </div>
+          <div class="stat-value" id="flaggedVal" style="color: var(--warning);">0</div>
+          <div class="stat-desc">Duplicate IDs or Amount mismatches</div>
+        </div>
+      </section>
+
+      <!-- Dashboard Details split layout -->
+      <div class="dashboard-grid">
+        <!-- Sales & Reconciliation Table -->
+        <div class="glass" style="overflow: hidden;">
+          <div class="card-title-header">
+            <h3 class="card-title">Today's Sales Records</h3>
+            <span style="font-size: 13px; color: var(--text-muted);" id="dateLabel">Date: Today</span>
+          </div>
+          <div class="table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Sale ID</th>
+                  <th>Customer Name</th>
+                  <th>Expected</th>
+                  <th>Status</th>
+                  <th>Initiated At</th>
+                </tr>
+              </thead>
+              <tbody id="salesTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                    Loading today's sales entries...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Simulator Tools / Sandbox Operations -->
+        <div class="glass" style="padding: 24px;">
+          <h3 class="card-title" style="margin-bottom: 16px;">Daraja Sandbox C2B Simulation</h3>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+            Simulate a paybill confirmation from Safaricom locally to test auto-matching triggers.
+          </p>
+
+          <form id="simulateC2BForm" onsubmit="handleC2BSimulate(event)">
+            <div class="form-group">
+              <label class="form-label" for="simPhone">Customer Phone</label>
+              <input class="form-input" type="tel" id="simPhone" placeholder="e.g. 254708374149" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="simAmount">Payment Amount (KES)</label>
+              <input class="form-input" type="number" id="simAmount" placeholder="e.g. 2500" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="simBillRef">Account Reference (BillRef)</label>
+              <input class="form-input" type="text" id="simBillRef" placeholder="e.g. Enter Sale ID or phone" required>
+              <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                Enter a pending **Sale ID** to test the automatic match.
+              </p>
+            </div>
+            <button class="btn" type="submit" id="simBtn">Simulate Payment</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Load daily reconciliation numbers and sales
+    async function loadDashboard() {
+      try {
+        const data = await apiCall('/reports/daily');
+        
+        // Populate stats
+        const r = data.report || { total_expected: 0, total_received: 0, verified_count: 0, pending_count: 0, flagged_count: 0 };
+        document.getElementById('expectedVal').innerText = `Ksh ${parseFloat(r.total_expected).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        document.getElementById('receivedVal').innerText = `Ksh ${parseFloat(r.total_received).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        
+        document.getElementById('verifiedVal').innerText = r.verified_count;
+        document.getElementById('verifiedCount').innerText = r.verified_count;
+        
+        document.getElementById('flaggedVal').innerText = r.flagged_count;
+        document.getElementById('flaggedCount').innerText = r.flagged_count;
+
+        // Set date label
+        if (r.report_date) {
+          const dateObj = new Date(r.report_date);
+          document.getElementById('dateLabel').innerText = `Date: ${dateObj.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}`;
+        }
+
+        // Render sales table
+        const tbody = document.getElementById('salesTableBody');
+        tbody.innerHTML = '';
+
+        if (!data.sales || data.sales.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                No sales records initialized today. Click "New Sale Entry" to begin.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        data.sales.forEach(sale => {
+          const row = document.createElement('tr');
+          
+          let badgeClass = 'badge-pending';
+          if (sale.status === 'verified') badgeClass = 'badge-verified';
+          if (sale.status === 'flagged') {
+            badgeClass = 'badge-flagged';
+            row.classList.add('flagged-row'); // Aligns with Fig 6 (red left border highlights flagged entries)
+          }
+          if (sale.status === 'failed') badgeClass = 'badge-failed';
+
+          const time = new Date(sale.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          row.innerHTML = `
+            <td>#${sale.sale_id}</td>
+            <td>
+              <div style="font-weight: 500;">${sale.customer_name || 'Walk-in Customer'}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${sale.customer_phone}</div>
+            </td>
+            <td style="font-weight: 600;">Ksh ${parseFloat(sale.expected_amount).toFixed(2)}</td>
+            <td><span class="badge ${badgeClass}">${sale.status}</span></td>
+            <td>${time}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        showToast(err.message || 'Error loading dashboard report.', 'danger');
+      }
+    }
+
+    // Handle C2B Simulator Form Submission
+    async function handleC2BSimulate(e) {
+      e.preventDefault();
+      const phone = document.getElementById('simPhone').value;
+      const amount = document.getElementById('simAmount').value;
+      const billRef = document.getElementById('simBillRef').value;
+      const btn = document.getElementById('simBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'Triggering simulation...';
+
+      try {
+        const res = await apiCall('/payments/simulate-c2b', {
+          method: 'POST',
+          body: JSON.stringify({ phone, amount, billRef })
+        });
+        showToast('C2B simulation request dispatched!', 'success');
+        
+        // Wait 3 seconds for mock transaction and auto-matching callback, then refresh
+        setTimeout(() => {
+          loadDashboard();
+          btn.disabled = false;
+          btn.innerText = 'Simulate Payment';
+          showToast('Dashboard reloaded with simulation results!', 'success');
+        }, 3000);
+      } catch (err) {
+        showToast(err.message || 'C2B simulation failed.', 'danger');
+        btn.disabled = false;
+        btn.innerText = 'Simulate Payment';
+      }
+    }
+
+    // Load initial data
+    loadDashboard();
+  </script>
+</body>
+</html>

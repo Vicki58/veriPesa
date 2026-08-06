@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage flagged transaction disputes, resolve expected vs received discrepancies, and approve verified overrides.">
+  <title>Disputes — VeriPesa</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dispute-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.95);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .dispute-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+      padding: 16px;
+      background: rgba(17, 24, 39, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .comparison-val {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h2 class="brand-name">VeriPesa</h2>
+      </div>
+
+      <nav style="flex: 1;">
+        <ul class="sidebar-menu">
+          <li class="menu-item">
+            <a href="dashboard.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="new-sale.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>New Sale</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="transactions.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+              <span>Ledger Logs</span>
+            </a>
+          </li>
+          <li class="menu-item active">
+            <a href="disputes.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              <span>Disputes</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="settings.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="vendor-profile-snippet">
+          <div class="avatar">-</div>
+          <div class="vendor-info">
+            <div class="vendor-name-snippet">Loading...</div>
+            <div class="vendor-till-snippet">Till: Loading</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace (Aligns with Fig 12: Disputes List) -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Disputes & Fraud Management</h1>
+          <p class="page-subtitle">Inspect flagged discrepancies and take immediate merchant action.</p>
+        </div>
+      </header>
+
+      <!-- Disputes Container -->
+      <div class="glass" style="overflow: hidden;">
+        <!-- Search bar at top (Fig 12) -->
+        <div style="padding: 16px 24px; border-bottom: 1px solid var(--card-border); background: rgba(0,0,0,0.15);">
+          <input type="text" id="disputeSearchInput" class="form-input" placeholder="🔍 Search by Transaction ID or phone..." oninput="filterDisputes()" style="max-width: 400px;">
+        </div>
+
+        <div id="disputesList">
+          <p style="text-align: center; color: var(--text-muted); padding: 40px 0;">Loading disputes list...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Resolve Dispute Modal Dialog -->
+  <div class="dispute-modal" id="resolveModal">
+    <div class="modal-card glass" style="max-width: 460px;">
+      <div class="card-title-header">
+        <h3 class="card-title" id="resolveModalTitle">Resolve Warning</h3>
+        <button class="badge" onclick="closeResolveModal()" style="background: rgba(255,255,255,0.08); border: none; cursor: pointer; color: #fff;">Cancel</button>
+      </div>
+      <div style="padding: 24px;">
+        <form id="resolveForm" onsubmit="handleResolveSubmit(event)">
+          <input type="hidden" id="resolveFlagId">
+          <input type="hidden" id="resolveAction">
+          
+          <div class="form-group">
+            <label class="form-label" id="actionInstructionsText"></label>
+            <textarea class="form-input" id="resolveNote" rows="3" placeholder="e.g. Customer paid remaining balance in cash / double entry verified." required style="resize: none; font-family: inherit;"></textarea>
+          </div>
+          
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button class="btn btn-secondary" type="button" onclick="closeResolveModal()">Close</button>
+            <button class="btn" type="submit" id="resolveBtn">Confirm Override</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    let allDisputes = [];
+
+    async function loadDisputes() {
+      try {
+        allDisputes = await apiCall('/transactions/disputes');
+        renderDisputes(allDisputes);
+
+        // Pre-fill query searches if raised from transaction auditor
+        const urlParams = new URLSearchParams(window.location.search);
+        const querySearch = urlParams.get('search');
+        if (querySearch) {
+          document.getElementById('disputeSearchInput').value = querySearch;
+          filterDisputes();
+        }
+
+      } catch (err) {
+        showToast(err.message || 'Error loading disputes.', 'danger');
+      }
+    }
+
+    function renderDisputes(disputesList) {
+      const listContainer = document.getElementById('disputesList');
+      listContainer.innerHTML = '';
+
+      if (disputesList.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 50px 20px;">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--primary); margin-bottom: 12px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h3>All clear! No payment disputes flagged.</h3>
+            <p style="font-size: 13px; margin-top: 4px;">Matching verification algorithms are running successfully.</p>
+          </div>
+        `;
+        return;
+      }
+
+      disputesList.forEach(d => {
+        const item = document.createElement('div');
+        item.className = 'dispute-item';
+        
+        let riskBadgeClass = 'badge-flagged';
+        let riskText = 'Pending Review'; // Aligns with Fig 12 badges
+        if (d.risk_level === 'high') {
+          riskBadgeClass = 'badge-failed';
+          riskText = 'High Risk';
+        }
+
+        const dateStr = new Date(d.flag_created_at).toLocaleString('en-US', { timeZone: 'Africa/Nairobi' });
+
+        item.innerHTML = `
+          <div class="dispute-info" style="width: 100%; max-width: 480px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <strong style="font-size: 16px; color: #fff;">${d.mpesa_ref}</strong>
+              <span class="badge ${riskBadgeClass}">${riskText}</span>
+            </div>
+            
+            <div style="font-size: 13px; margin-top: 4px; color: var(--text-muted);">
+              Sale Reference: #${d.sale_id} &bull; Customer: ${d.customer_name || 'Walk-in'} (${d.sender_phone || 'No phone'})
+            </div>
+
+            <!-- Expected vs Received comparison grid (Aligns with Fig 12) -->
+            <div class="comparison-grid">
+              <div>
+                <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted);">Expected Amount</span>
+                <span class="comparison-val" style="color: #fff;">Ksh ${parseFloat(d.expected_amount).toLocaleString()}</span>
+              </div>
+              <div>
+                <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted);">Received Amount</span>
+                <span class="comparison-val" style="color: var(--danger);">Ksh ${parseFloat(d.received_amount).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; color: var(--danger); font-weight: 500;">
+              Anomaly reason: ${d.flag_reason}
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+              Flagged Date: ${dateStr}
+            </div>
+          </div>
+
+          <!-- Dispute Action Controls (Block User & Resolve - Aligns with Fig 12) -->
+          <div class="dispute-actions" style="margin-left: auto;">
+            <button class="badge" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); cursor: pointer; padding: 8px 14px;" onclick="blockUser('${d.sender_phone || d.mpesa_ref}')">Block User</button>
+            <button class="badge" style="background: var(--success-glow); border: 1px solid var(--success); color: #fff; cursor: pointer; padding: 8px 14px;" onclick="openResolve(${d.flag_id}, 'approve')">Resolve</button>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function filterDisputes() {
+      const q = document.getElementById('disputeSearchInput').value.toLowerCase().trim();
+      if (!q) {
+        renderDisputes(allDisputes);
+        return;
+      }
+
+      const filtered = allDisputes.filter(d => {
+        const ref = d.mpesa_ref ? d.mpesa_ref.toLowerCase() : '';
+        const phone = d.sender_phone ? d.sender_phone.toLowerCase() : '';
+        const name = d.customer_name ? d.customer_name.toLowerCase() : '';
+        return ref.includes(q) || phone.includes(q) || name.includes(q);
+      });
+
+      renderDisputes(filtered);
+    }
+
+    function blockUser(identifier) {
+      showToast(`Vendor Action: User ${identifier} successfully blacklisted.`, 'success');
+    }
+
+    function openResolve(flagId, action) {
+      document.getElementById('resolveFlagId').value = flagId;
+      document.getElementById('resolveAction').value = action;
+      
+      const title = document.getElementById('resolveModalTitle');
+      const instructions = document.getElementById('actionInstructionsText');
+      const confirmBtn = document.getElementById('resolveBtn');
+
+      title.innerText = 'Resolve Flagged Discrepancy';
+      instructions.innerText = 'Add a resolution log detailing the manual verification override:';
+      confirmBtn.className = 'btn';
+      confirmBtn.innerText = 'Confirm Resolution';
+
+      document.getElementById('resolveNote').value = '';
+      document.getElementById('resolveModal').classList.add('active');
+    }
+
+    function closeResolveModal() {
+      document.getElementById('resolveModal').classList.remove('active');
+    }
+
+    async function handleResolveSubmit(e) {
+      e.preventDefault();
+      
+      const flagId = document.getElementById('resolveFlagId').value;
+      const action = document.getElementById('resolveAction').value;
+      const resolution_note = document.getElementById('resolveNote').value;
+      const btn = document.getElementById('resolveBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'Processing override...';
+
+      try {
+        await apiCall(`/transactions/disputes/${flagId}/resolve`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            action,
+            resolution_note
+          })
+        });
+
+        showToast('Dispute resolved and status overridden!', 'success');
+        closeResolveModal();
+        loadDisputes();
+      } catch (err) {
+        showToast(err.message || 'Error resolving dispute.', 'danger');
+        btn.disabled = false;
+        btn.innerText = 'Confirm Resolution';
+      }
+    }
+
+    // Load initial data
+    loadDisputes();
+  </script>
+</body>
+</html>

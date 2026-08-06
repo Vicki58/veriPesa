@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View verified payments ledger logs and audit transaction histories.">
+  <title>Ledger Logs — VeriPesa</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .sub-tabs {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .sub-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    .sub-tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.9);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h2 class="brand-name">VeriPesa</h2>
+      </div>
+
+      <nav style="flex: 1;">
+        <ul class="sidebar-menu">
+          <li class="menu-item">
+            <a href="dashboard.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="new-sale.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>New Sale</span>
+            </a>
+          </li>
+          <li class="menu-item active">
+            <a href="transactions.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+              <span>Ledger Logs</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="disputes.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              <span>Disputes</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="settings.html">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="vendor-profile-snippet">
+          <div class="avatar">-</div>
+          <div class="vendor-info">
+            <div class="vendor-name-snippet">Loading...</div>
+            <div class="vendor-till-snippet">Till: Loading</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Payment Ledger Logs</h1>
+          <p class="page-subtitle">Historical records of verified and pending M-Pesa receipts.</p>
+        </div>
+      </header>
+
+      <div class="sub-tabs">
+        <button id="matchedTab" class="sub-tab-btn active" onclick="switchLedgerTab('matched')">Matched Payments</button>
+        <button id="unmatchedTab" class="sub-tab-btn" onclick="switchLedgerTab('unmatched')">Unmatched PayBill Deposits</button>
+      </div>
+
+      <!-- Matched Payments Table -->
+      <div id="matchedSection" class="glass" style="overflow: hidden;">
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Receipt No</th>
+                <th>Sale ID</th>
+                <th>Sender</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Matched Status</th>
+                <th>Timestamp (EAT)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="matchedTbody">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px 0;">Loading ledger...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Unmatched Deposits Table -->
+      <div id="unmatchedSection" class="glass" style="overflow: hidden; display: none;">
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Receipt No</th>
+                <th>Sender Phone</th>
+                <th>Sender Name</th>
+                <th>Amount</th>
+                <th>Account Reference (BillRef)</th>
+                <th>Timestamp (EAT)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="unmatchedTbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px 0;">Loading deposits...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail & Audit Log Modal (Aligns with Fig 11: Transaction Details & Audit Log) -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-card glass" style="max-width: 500px;">
+      <div class="card-title-header">
+        <h3 class="card-title">Transaction Details</h3>
+        <button class="badge" onclick="closeModal()" style="background: rgba(255,255,255,0.08); border: none; cursor: pointer; color: #fff;">Close</button>
+      </div>
+      
+      <div style="padding: 24px;">
+        <!-- Amount Header & Badge -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 16px;">
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Amount</div>
+            <h2 style="font-size: 28px; font-weight: 800; color: #fff; margin-top: 4px;" id="modalAmountText">Ksh 0.00</h2>
+          </div>
+          <span class="badge badge-verified" id="modalStatusBadge">Verified</span>
+        </div>
+
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;" id="modalDateLabel">
+          📅 Oct 24, 2023 &bull; 14:32 EAT
+        </div>
+
+        <!-- Transaction Info Card -->
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px;">
+          <div style="font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.03em;">Transaction Info</div>
+          
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted);">Transaction ID:</span>
+            <span style="font-weight: 600; color: #fff;" id="modalReceipt">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted);">Customer Name:</span>
+            <span style="font-weight: 500;" id="modalSenderName">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted);">Phone Number:</span>
+            <span style="font-weight: 500;" id="modalPhone">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">Payment Method:</span>
+            <span style="font-weight: 500;" id="modalMethod">M-Pesa STK Push</span>
+          </div>
+        </div>
+
+        <!-- Audit Log Section -->
+        <div style="font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.03em;">Audit Log</div>
+        <div class="audit-log" id="modalAuditLog" style="padding: 0 0 20px 0;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Actions (Raise Dispute & Download) -->
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 20px;">
+          <button class="btn" onclick="showToast('Receipt downloaded successfully!', 'success')">Download Receipt</button>
+          <button class="btn btn-secondary" onclick="raiseDisputeFromModal()">Raise Dispute</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim/Link Sale Modal -->
+  <div class="modal-overlay" id="claimModal">
+    <div class="modal-card glass" style="max-width: 440px;">
+      <div class="card-title-header">
+        <h3 class="card-title">Link Transaction to Sale</h3>
+        <button class="badge" onclick="closeClaimModal()" style="background: rgba(255,255,255,0.08); border: none; cursor: pointer; color: #fff;">Cancel</button>
+      </div>
+      <div style="padding: 24px;">
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+          Manually link unclaimed receipt <strong id="claimReceiptText"></strong> (KES <span id="claimAmountText"></span>) to an outstanding pending sale.
+        </p>
+        <form id="claimForm" onsubmit="handleClaimSubmit(event)">
+          <input type="hidden" id="claimTxId">
+          <div class="form-group">
+            <label class="form-label" for="claimSaleId">Enter Pending Sale ID</label>
+            <input class="form-input" type="number" id="claimSaleId" placeholder="e.g. 5" required>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+              Reconciliation checks will run immediately after linking.
+            </p>
+          </div>
+          <button class="btn" type="submit" id="claimBtn">Verify & Link Payment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    function switchLedgerTab(tab) {
+      const mTab = document.getElementById('matchedTab');
+      const uTab = document.getElementById('unmatchedTab');
+      const mSect = document.getElementById('matchedSection');
+      const uSect = document.getElementById('unmatchedSection');
+
+      if (tab === 'matched') {
+        mTab.classList.add('active');
+        uTab.classList.remove('active');
+        mSect.style.display = 'block';
+        uSect.style.display = 'none';
+      } else {
+        uTab.classList.add('active');
+        mTab.classList.remove('active');
+        mSect.style.display = 'none';
+        uSect.style.display = 'block';
+      }
+    }
+
+    async function loadLedger() {
+      try {
+        const data = await apiCall('/transactions');
+        
+        // Render Matched Table
+        const matchedTbody = document.getElementById('matchedTbody');
+        matchedTbody.innerHTML = '';
+        if (data.matched.length === 0) {
+          matchedTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px 0;">No matched payments found.</td></tr>`;
+        } else {
+          data.matched.forEach(tx => {
+            const tr = document.createElement('tr');
+            const dateStr = new Date(tx.timestamp).toLocaleString('en-US', { timeZone: 'Africa/Nairobi' });
+            
+            const badgeClass = tx.matched ? 'badge-verified' : 'badge-flagged';
+            const statusLabel = tx.matched ? 'Verified' : 'Flagged';
+
+            if (!tx.matched) {
+              tr.classList.add('flagged-row'); // Red left border for flagged items! (Fig 6)
+            }
+
+            tr.innerHTML = `
+              <td style="font-weight: 600;">${tx.mpesa_ref}</td>
+              <td>#${tx.sale_id}</td>
+              <td>
+                <div style="font-weight: 500;">${tx.customer_name || 'Walk-in Customer'}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">${tx.sender_phone || 'N/A'}</div>
+              </td>
+              <td style="font-weight: 600;">Ksh ${parseFloat(tx.received_amount).toFixed(2)}</td>
+              <td style="text-transform: uppercase; font-size: 11px;">${tx.transaction_type}</td>
+              <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+              <td style="font-size: 12px; color: var(--text-muted);">${dateStr}</td>
+              <td>
+                <button class="badge" style="background: var(--primary-glow); border: 1px solid var(--primary); color: #fff; cursor: pointer;" onclick="viewAudit(${tx.transaction_id})">Audit Logs</button>
+              </td>
+            `;
+            matchedTbody.appendChild(tr);
+          });
+        }
+
+        // Render Unmatched Table
+        const unmatchedTbody = document.getElementById('unmatchedTbody');
+        unmatchedTbody.innerHTML = '';
+        if (data.unmatched.length === 0) {
+          unmatchedTbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px 0;">No unmatched PayBill deposits. All clear!</td></tr>`;
+        } else {
+          data.unmatched.forEach(tx => {
+            const tr = document.createElement('tr');
+            const dateStr = new Date(tx.timestamp).toLocaleString('en-US', { timeZone: 'Africa/Nairobi' });
+
+            tr.innerHTML = `
+              <td style="font-weight: 600;">${tx.mpesa_ref}</td>
+              <td>${tx.sender_phone || 'N/A'}</td>
+              <td>${tx.sender_name || 'Anonymous Customer'}</td>
+              <td style="font-weight: 600; color: var(--accent-cyan);">Ksh ${parseFloat(tx.received_amount).toFixed(2)}</td>
+              <td style="font-weight: 500; font-family: monospace;">${tx.bill_ref_number || tx.mpesa_ref}</td>
+              <td style="font-size: 12px; color: var(--text-muted);">${dateStr}</td>
+              <td>
+                <button class="badge" style="background: var(--success-glow); border: 1px solid var(--success); color: #fff; cursor: pointer;" onclick="openClaim(${tx.transaction_id}, '${tx.mpesa_ref}', ${tx.received_amount})">Link / Claim</button>
+              </td>
+            `;
+            unmatchedTbody.appendChild(tr);
+          });
+        }
+
+      } catch (err) {
+        showToast(err.message || 'Error loading ledger logs.', 'danger');
+      }
+    }
+
+    // Modal view audit trail (Aligns with Fig 11)
+    async function viewAudit(txId) {
+      try {
+        const data = await apiCall(`/transactions/${txId}`);
+        const tx = data.transaction;
+        const flags = data.flags || [];
+
+        document.getElementById('modalReceipt').innerText = tx.mpesa_ref;
+        document.getElementById('modalAmountText').innerText = `Ksh ${parseFloat(tx.received_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        document.getElementById('modalSenderName').innerText = tx.sender_name || 'Walk-in Customer';
+        document.getElementById('modalPhone').innerText = tx.sender_phone || 'No Phone';
+        document.getElementById('modalMethod').innerText = tx.transaction_type === 'stk_push' ? 'M-Pesa STK Push' : 'M-Pesa PayBill C2B';
+
+        const statusBadge = document.getElementById('modalStatusBadge');
+        if (flags.length > 0) {
+          statusBadge.innerText = 'Flagged';
+          statusBadge.className = 'badge badge-flagged';
+        } else {
+          statusBadge.innerText = 'Verified';
+          statusBadge.className = 'badge badge-verified';
+        }
+
+        const dateStr = new Date(tx.timestamp).toLocaleString('en-US', { 
+          timeZone: 'Africa/Nairobi',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        document.getElementById('modalDateLabel').innerText = `📅 ${dateStr} EAT`;
+
+        // Populate Audit logs
+        const auditContainer = document.getElementById('modalAuditLog');
+        auditContainer.innerHTML = '';
+
+        const pushTimeStr = new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const promptTime = new Date(new Date(tx.timestamp).getTime() - 4000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // Step 1: Prompt initiated (Payment Initiated)
+        auditContainer.innerHTML += `
+          <div class="audit-step">
+            <div class="audit-marker success"></div>
+            <div class="audit-content">
+              <div class="audit-time">${promptTime} EAT</div>
+              <div class="audit-text">Payment Initiated</div>
+            </div>
+          </div>
+        `;
+
+        // Step 2: Callback receipt (STK Push Sent)
+        auditContainer.innerHTML += `
+          <div class="audit-step">
+            <div class="audit-marker success"></div>
+            <div class="audit-content">
+              <div class="audit-time">${pushTimeStr} EAT</div>
+              <div class="audit-text">STK Push Sent</div>
+            </div>
+          </div>
+        `;
+
+        // Step 3: Reconciliation check (Payment Verified)
+        const matchTime = new Date(new Date(tx.timestamp).getTime() + 100).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        if (flags.length > 0) {
+          flags.forEach(flag => {
+            const flagTime = new Date(flag.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            auditContainer.innerHTML += `
+              <div class="audit-step">
+                <div class="audit-marker danger"></div>
+                <div class="audit-content">
+                  <div class="audit-time">${flagTime} EAT</div>
+                  <div class="audit-text" style="color: var(--danger);">Flagged: ${flag.flag_reason} (${flag.risk_level.toUpperCase()} severity)</div>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          auditContainer.innerHTML += `
+            <div class="audit-step">
+              <div class="audit-marker success"></div>
+              <div class="audit-content">
+                <div class="audit-time">${matchTime} EAT</div>
+                <div class="audit-text" style="color: var(--success); font-weight: 600;">Payment Verified</div>
+              </div>
+            </div>
+          `;
+        }
+
+        document.getElementById('detailModal').classList.add('active');
+      } catch (err) {
+        showToast(err.message || 'Error loading transaction details.', 'danger');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    function raiseDisputeFromModal() {
+      const receipt = document.getElementById('modalReceipt').innerText;
+      closeModal();
+      window.location.href = `disputes.html?search=${receipt}`;
+    }
+
+    // Claim Unmatched Deposits Modal
+    function openClaim(txId, receipt, amount) {
+      document.getElementById('claimTxId').value = txId;
+      document.getElementById('claimReceiptText').innerText = receipt;
+      document.getElementById('claimAmountText').innerText = parseFloat(amount).toFixed(2);
+      document.getElementById('claimModal').classList.add('active');
+    }
+
+    function closeClaimModal() {
+      document.getElementById('claimModal').classList.remove('active');
+    }
+
+    async function handleClaimSubmit(e) {
+      e.preventDefault();
+      const transaction_id = document.getElementById('claimTxId').value;
+      const sale_id = document.getElementById('claimSaleId').value;
+      const btn = document.getElementById('claimBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'Linking transaction...';
+
+      try {
+        const res = await apiCall('/transactions/claim', {
+          method: 'POST',
+          body: JSON.stringify({ sale_id, transaction_id })
+        });
+
+        showToast(res.message || 'Transaction claimed successfully!', 'success');
+        closeClaimModal();
+        loadLedger();
+      } catch (err) {
+        showToast(err.message || 'Linking failed.', 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Verify & Link Payment';
+      }
+    }
+
+    // Load initial data
+    loadLedger();
+  </script>
+</body>
+</html>

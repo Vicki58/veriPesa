@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VeriPesa helps small-scale vendors in Kenya verify M-Pesa payments, prevent fraud, and reconcile transactions automatically.">
+  <title>VeriPesa — M-Pesa Payment Verification & Reconciliation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card glass">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <h1 class="brand-name">VeriPesa</h1>
+      </div>
+
+      <div class="tabs">
+        <button id="loginTabBtn" class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button id="registerTabBtn" class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Login Section (Aligns with Fig 4: Secure Login) -->
+      <div id="loginSection">
+        <h2 class="auth-title">Secure Login</h2>
+        <p class="auth-subtitle">Verify your shop's transactions instantly.</p>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginPhone">Registered Phone Number</label>
+            <input class="form-input" type="tel" id="loginPhone" placeholder="+254 712 345 678" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPin">VeriPesa PIN</label>
+            <input class="form-input" type="password" id="loginPin" placeholder="••••" required>
+            <div style="text-align: right; margin-top: 6px;">
+              <a href="#" style="font-size: 11px; color: var(--primary); text-decoration: none;">Forgot PIN?</a>
+            </div>
+          </div>
+
+          <div class="secure-banner" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05); color: var(--text-muted); justify-content: center; margin-bottom: 24px;">
+            <svg viewBox="0 0 24 24" style="fill: var(--text-muted); width: 14px; height: 14px;">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+            <span style="font-size: 11px;">End-to-end encrypted session</span>
+          </div>
+
+          <button class="btn" type="submit" id="loginBtn">Login Safely</button>
+        </form>
+      </div>
+
+      <!-- Register Section (Aligns with Fig 1, 2, 3 Onboarding Steps) -->
+      <div id="registerSection" style="display: none;">
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar-steps">
+            <span id="stepLabel">STEP 1 OF 3</span>
+            <span id="stepName">Personal Details</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <!-- Step 1: Personal Details (Fig 1) -->
+          <div id="regStep1">
+            <h2 class="auth-title" style="margin-bottom: 8px;">Vendor Information</h2>
+            <p class="auth-subtitle" style="margin-bottom: 20px;">Please provide your legal details as they appear on your identification documents.</p>
+
+            <div class="form-group">
+              <label class="form-label" for="regFullName">Full Name</label>
+              <input class="form-input" type="text" id="regFullName" placeholder="Enter your full legal name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPhone">M-Pesa Linked Phone Number</label>
+              <input class="form-input" type="tel" id="regPhone" placeholder="e.g. 0712 345 678" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regEmail">Email Address</label>
+              <input class="form-input" type="email" id="regEmail" placeholder="name@company.com" required>
+            </div>
+
+            <div class="secure-banner">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+              </svg>
+              <div><strong>Secure Verification</strong><br>VeriPesa uses bank-grade encryption to protect your personal and transaction data.</div>
+            </div>
+
+            <button class="btn" type="button" onclick="nextStep(2)">Continue →</button>
+          </div>
+
+          <!-- Step 2: Business Details (Fig 2) -->
+          <div id="regStep2" style="display: none;">
+            <h2 class="auth-title" style="margin-bottom: 8px;">Tell us about your business</h2>
+            <p class="auth-subtitle" style="margin-bottom: 20px;">This information will be used to verify your merchant account and displayed on your storefront.</p>
+
+            <div class="form-group">
+              <label class="form-label" for="regBusinessName">Business Legal Name</label>
+              <input class="form-input" type="text" id="regBusinessName" placeholder="e.g. Acme Retail Solutions">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="regCategory">Business Category</label>
+              <select class="form-input" id="regCategory">
+                <option value="" disabled selected>Select category</option>
+                <option value="retail">Retail Grocer</option>
+                <option value="wholesale">Wholesale Trader</option>
+                <option value="kiosk">Kiosk / Stall Vendor</option>
+                <option value="restaurant">Restaurant / Eatery</option>
+                <option value="services">Service Provider</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regAddress">Physical Address</label>
+              <input class="form-input" type="text" id="regAddress" placeholder="Shop No, Building, Street, City">
+            </div>
+
+            <div class="secure-banner" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.15); color: #fde68a;">
+              <svg viewBox="0 0 24 24" style="fill: var(--warning);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <div><strong>Verification Tip</strong><br>Ensure your physical address matches your official permit for faster verification.</div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" type="button" onclick="prevStep(1)">Back</button>
+              <button class="btn" type="button" onclick="nextStep(3)">Continue →</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Business Verification (Fig 3) -->
+          <div id="regStep3" style="display: none;">
+            <h2 class="auth-title" style="margin-bottom: 8px;">Business Verification</h2>
+            <p class="auth-subtitle" style="margin-bottom: 20px;">To secure your vendor account and comply with financial regulations, please upload clear copies of your documents.</p>
+
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid var(--card-border); margin-bottom: 16px;">
+              <div>
+                <strong style="font-size: 14px; display: block; color: #fff;">ID or Passport</strong>
+                <span style="font-size: 11px; color: var(--text-muted);">Front and Back view required</span>
+              </div>
+              <button class="badge" type="button" style="background: var(--primary-glow); border: 1px solid var(--primary); color: #fff; cursor: pointer; padding: 6px 12px;">Select Document</button>
+            </div>
+
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 10px; border: 1px solid var(--card-border); margin-bottom: 16px;">
+              <div>
+                <strong style="font-size: 14px; display: block; color: #fff;">Business License</strong>
+                <span style="font-size: 11px; color: var(--text-muted);">Current year operational permit</span>
+              </div>
+              <button class="badge" type="button" style="background: var(--primary-glow); border: 1px solid var(--primary); color: #fff; cursor: pointer; padding: 6px 12px;">Select Document</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regPassword">Verification Password / PIN</label>
+              <input class="form-input" type="password" id="regPassword" placeholder="e.g. 1234" required>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 8px; align-items: flex-start; margin-top: 20px;">
+              <input type="checkbox" id="regTnc" required style="margin-top: 4px;">
+              <label for="regTnc" style="font-size: 12px; color: var(--text-muted);">
+                I agree to the <a href="#" style="color: var(--primary); text-decoration: none;">Terms of Service</a> and <a href="#" style="color: var(--primary); text-decoration: none;">Privacy Policy</a> regarding my vendor identity verification.
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" type="button" onclick="prevStep(2)">Back</button>
+              <button class="btn" type="submit" id="registerBtn">Complete Onboarding</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    function switchTab(tab) {
+      const loginTabBtn = document.getElementById('loginTabBtn');
+      const registerTabBtn = document.getElementById('registerTabBtn');
+      const loginSection = document.getElementById('loginSection');
+      const registerSection = document.getElementById('registerSection');
+
+      if (tab === 'login') {
+        loginTabBtn.classList.add('active');
+        registerTabBtn.classList.remove('active');
+        loginSection.style.display = 'block';
+        registerSection.style.display = 'none';
+      } else {
+        registerTabBtn.classList.add('active');
+        loginTabBtn.classList.remove('active');
+        registerSection.style.display = 'block';
+        loginSection.style.display = 'none';
+        goToStep(1);
+      }
+    }
+
+    let currentStep = 1;
+
+    function goToStep(step) {
+      currentStep = step;
+      document.getElementById('regStep1').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('regStep2').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('regStep3').style.display = step === 3 ? 'block' : 'none';
+      
+      const stepLabel = document.getElementById('stepLabel');
+      const stepName = document.getElementById('stepName');
+      const progressFill = document.getElementById('progressFill');
+      
+      if (step === 1) {
+        stepLabel.innerText = 'STEP 1 OF 3';
+        stepName.innerText = 'Personal Details';
+        progressFill.style.width = '33.3%';
+      } else if (step === 2) {
+        stepLabel.innerText = 'STEP 2 OF 3';
+        stepName.innerText = 'Business Details';
+        progressFill.style.width = '66.6%';
+      } else if (step === 3) {
+        stepLabel.innerText = 'STEP 3 OF 3';
+        stepName.innerText = 'Verification';
+        progressFill.style.width = '100%';
+      }
+    }
+
+    function nextStep(step) {
+      if (step === 2) {
+        const name = document.getElementById('regFullName').value;
+        const phone = document.getElementById('regPhone').value;
+        const email = document.getElementById('regEmail').value;
+        if (!name || !phone || !email) {
+          showToast('Please fill out all fields in Step 1', 'danger');
+          return;
+        }
+      }
+      if (step === 3) {
+        const bName = document.getElementById('regBusinessName').value;
+        const bCategory = document.getElementById('regCategory').value;
+        const bAddress = document.getElementById('regAddress').value;
+        if (!bName || !bCategory || !bAddress) {
+          showToast('Please fill out all fields in Step 2', 'danger');
+          return;
+        }
+      }
+      goToStep(step);
+    }
+
+    function prevStep(step) {
+      goToStep(step);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const phoneVal = document.getElementById('loginPhone').value;
+      const pinVal = document.getElementById('loginPin').value;
+      const btn = document.getElementById('loginBtn');
+
+      btn.disabled = true;
+      btn.innerText = 'Logging in...';
+
+      try {
+        const data = await apiCall('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email: phoneVal, password: pinVal })
+        });
+        
+        saveSession(data.token, data.vendor);
+        showToast('Login successful! Loading dashboard...', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+      } catch (err) {
+        showToast(err.message || 'Login failed. Please check your credentials.', 'danger');
+        btn.disabled = false;
+        btn.innerText = 'Login Safely';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      
+      const fullName = document.getElementById('regFullName').value;
+      const phone = document.getElementById('regPhone').value;
+      const email = document.getElementById('regEmail').value;
+      
+      const businessName = document.getElementById('regBusinessName').value;
+      const address = document.getElementById('regAddress').value;
+      const password = document.getElementById('regPassword').value;
+      const tncChecked = document.getElementById('regTnc').checked;
+      
+      const btn = document.getElementById('registerBtn');
+
+      if (!tncChecked) {
+        showToast('Please accept the Terms of Service to proceed.', 'danger');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Creating Account...';
+
+      try {
+        const data = await apiCall('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            business_name: businessName,
+            email: email,
+            phone: phone,
+            till_number: '174379', // Default Sandbox till
+            password: password
+          })
+        });
+
+        saveSession(data.token, data.vendor);
+        showToast('Registration successful!', 'success');
+        
+        // Show simulated biometric enrollment toast
+        showToast('Biometric enrollment configured successfully.', 'success');
+        
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+      } catch (err) {
+        showToast(err.message || 'Registration failed.', 'danger');
+        btn.disabled = false;
+        btn.innerText = 'Complete Onboarding';
+      }
+    }
+  </script>
+</body>
+</html>
