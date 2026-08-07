@@ -851,7 +851,26 @@ body.light-theme h4,
 body.light-theme .brand-name,
 body.light-theme .page-title,
 body.light-theme .card-title {
-  color: #0f172a;
+  color: #0f172a !important;
+}
+
+body.light-theme .dispute-item div,
+body.light-theme .dispute-item span,
+body.light-theme .dispute-info div,
+body.light-theme .dispute-info span,
+body.light-theme #modalAmountText,
+body.light-theme #modalReceipt,
+body.light-theme #pollingAmountText,
+body.light-theme #successAmountText {
+  color: #0f172a !important;
+}
+
+body.light-theme .dispute-item span {
+  color: var(--text-muted) !important;
+}
+
+body.light-theme #avatarBig {
+  color: #ffffff !important;
 }
 
 body.light-theme .form-input {
