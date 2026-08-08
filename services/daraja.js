@@ -69,36 +69,40 @@ const initiateStkPush = async (phone, amount, accountRef) => {
       CustomerMessage: 'Success. Request accepted for processing.'
     };
 
-    // Auto-trigger callback simulation in background after 4 seconds
-    setTimeout(async () => {
-      try {
-        const port = process.env.PORT || 3000;
-        const mockCallbackPayload = {
-          Body: {
-            stkCallback: {
-              MerchantRequestID: mockMerchantId,
-              CheckoutRequestID: mockCheckoutId,
-              ResultCode: 0,
-              ResultDesc: 'The service request is processed successfully.',
-              CallbackMetadata: {
-                Item: [
-                  { Name: 'Amount', Value: parseFloat(amount) },
-                  { Name: 'MpesaReceiptNumber', Value: 'MP' + Math.random().toString(36).substring(2, 10).toUpperCase() },
-                  { Name: 'Balance', Value: 0 },
-                  { Name: 'TransactionDate', Value: parseInt(new Date().toISOString().replace(/[-T:.Z]/g,'').slice(0,14)) },
-                  { Name: 'PhoneNumber', Value: parseInt(formattedPhone) }
-                ]
+    // Auto-trigger callback simulation in background after 4 seconds only for the sandbox auto-approve phone number
+    if (formattedPhone === '254708374149') {
+      setTimeout(async () => {
+        try {
+          const port = process.env.PORT || 3000;
+          const mockCallbackPayload = {
+            Body: {
+              stkCallback: {
+                MerchantRequestID: mockMerchantId,
+                CheckoutRequestID: mockCheckoutId,
+                ResultCode: 0,
+                ResultDesc: 'The service request is processed successfully.',
+                CallbackMetadata: {
+                  Item: [
+                    { Name: 'Amount', Value: parseFloat(amount) },
+                    { Name: 'MpesaReceiptNumber', Value: 'MP' + Math.random().toString(36).substring(2, 10).toUpperCase() },
+                    { Name: 'Balance', Value: 0 },
+                    { Name: 'TransactionDate', Value: parseInt(new Date().toISOString().replace(/[-T:.Z]/g,'').slice(0,14)) },
+                    { Name: 'PhoneNumber', Value: parseInt(formattedPhone) }
+                  ]
+                }
               }
             }
-          }
-        };
+          };
 
-        await axios.post(`http://localhost:${port}/api/callback/stk`, mockCallbackPayload);
-        console.log(`[Mock Callback] Successfully simulated payment callback for CheckoutRequestID: ${mockCheckoutId}`);
-      } catch (err) {
-        console.error('[Mock Callback Error] Could not deliver mock callback:', err.message);
-      }
-    }, 4000);
+          await axios.post(`http://localhost:${port}/api/callback/stk`, mockCallbackPayload);
+          console.log(`[Mock Callback] Successfully simulated payment callback for CheckoutRequestID: ${mockCheckoutId}`);
+        } catch (err) {
+          console.error('[Mock Callback Error] Could not deliver mock callback:', err.message);
+        }
+      }, 4000);
+    } else {
+      console.log(`[Mock STK] Phone ${formattedPhone} is not the sandbox auto-approve number. Leaving request pending to allow manual C2B mismatch testing.`);
+    }
 
     return mockResponse;
   }
